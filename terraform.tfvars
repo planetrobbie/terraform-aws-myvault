@@ -1,0 +1,14 @@
+global_region       = "eu-west-3"
+dns_domain          = "aws.yet.org"
+cluster_name        = "vaulty"
+vault_cluster_size  = 2
+consul_cluster_size = 3
+instance_type       = "t2.medium"
+ami_id              = "ami-38a01045"
+my_bucket           = "vault-packer"
+ssh_key_name	      = "sebastien-key"
+vpc_name            = "sebastien-vpc"
+availability_zones  = ["eu-west-3a", "eu-west-3b", "eu-west-3c"]
+private_subnets     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+public_subnets      = ["10.0.10.0/24", "10.0.20.0/24", "10.0.30.0/24"]
+aws_access_key      = "XX"

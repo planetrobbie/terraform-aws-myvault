@@ -1,0 +1,16 @@
+127.0.0.1 localhost
+
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+
+${b} b bastion
+${v1} v1 vault-01 v1.${dns_domain} vault.${dns_domain}
+${v2} v2 vault-02 v2.${dns_domain}
+${c1} c1 consul-01 c1.${dns_domain}
+${c2} c2 consul-02 c2.${dns_domain}
+${c3} c3 consul-03 c3.${dns_domain}

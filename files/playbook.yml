@@ -1,0 +1,152 @@
+# python2 installation
+- hosts: all
+  gather_facts: False
+
+  tasks:
+  - name: install python 2
+    become: true
+    raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+
+  - name: consistent hosts file
+    become: true
+    template: src=./etc_hosts dest=/etc/hosts
+
+# Prepare machines to be nice with us
+- hosts: front
+  
+  tasks: 
+  - name: install required packages
+    become: true
+    apt:
+      pkg: ['zsh', 'jq', 'unzip', 'python-pip', 'python-setuptools', 'python-openssl', 'python-crcmod']
+      state: latest
+
+  - name: Download Pet, Simple command-line snippet manager, written in Go.
+    become: true
+    get_url:
+      url: https://github.com/knqyf263/pet/releases/download/v0.3.2/pet_0.3.2_linux_amd64.deb
+      dest: /tmp/
+
+  - name: Install Pet
+    become: true
+    apt:
+      deb: /tmp/pet_0.3.2_linux_amd64.deb
+      state: present
+
+  - name: Make sure /home/${ssh_user}/.config is owned by correct user
+    become: true
+    file:
+      path: /home/${ssh_user}/.config
+      owner: ${ssh_user}
+
+  - name: Creates Pet config directory
+    file:
+      path: "/home/${ssh_user}/.config/pet"
+      state: directory
+  
+  - name: Move Pet config where it is supposed to be
+    copy:
+      src: /tmp/snippet.toml
+      dest: /home/${ssh_user}/.config/pet
+
+  - name: Clone Oh My Zsh! repository
+    git:
+      repo: https://github.com/planetrobbie/oh-my-zsh.git
+      dest: "~/.oh-my-zsh"
+
+  - name: Create a new zsh config from the template in the repo
+    command: cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+    args:
+      creates: "~/.zshrc"
+
+  - name: Set zsh as default shell
+    user:
+      name: "${ssh_user}"
+      shell: /usr/bin/zsh
+    sudo: yes
+
+  - name: mirror fzf Pet dependency from github
+    git:
+      repo: 'https://github.com/junegunn/fzf.git'
+      depth: 1
+      dest: ~/.fzf
+      update: no
+
+  - name: install fzf
+    command: ~/.fzf/install --all
+
+  - name: Download ngrok
+    get_url:
+      url: https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+      dest: /tmp/
+
+  - name: Install ngrok
+    become: true
+    unarchive:
+      src: /tmp/ngrok-stable-linux-amd64.zip
+      dest: /usr/local/bin
+      remote_src: yes
+
+
+# dealing with hostname
+- hosts: localhost
+  become: true
+
+  tasks:
+
+  - name: updating hostname
+    hostname:
+      name:  bastion
+
+- hosts: v1
+
+  tasks:
+
+  - name: updating hostname
+    become: true
+    hostname:
+      name:  v1
+  
+  - name: Vault Environment Variable
+    lineinfile:
+      dest: "/home/${ssh_user}/.zshrc"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: 'VAULT_ADDR', line: 'export VAULT_ADDR="https://v1.${dns_domain}:8200"' }
+      - { regexp: 'VAULT_CACERT', line: 'export VAULT_CACERT="/etc/ssl/certs/cert.pem"' }
+
+
+- hosts: v2
+
+  tasks:
+
+  - name: updating hostname
+    become: true
+    hostname:
+      name:  v2
+
+  - name: Vault Environment Variable
+    lineinfile:
+      dest: "/home/${ssh_user}/.zshrc"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: 'VAULT_ADDR', line: 'export VAULT_ADDR="https://v2.${dns_domain}:8200"' }
+      - { regexp: 'VAULT_CACERT', line: 'export VAULT_CACERT="/etc/ssl/certs/cert.pem"' }
+
+- hosts: c1
+
+  tasks:
+  - name: updating hostname
+    become: true
+    hostname:
+      name:  c1
+  
+  - name: Consul Environment Variable
+    lineinfile:
+      dest: "/home/${ssh_user}/.zshrc"
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+    with_items:
+      - { regexp: 'CONSUL_HTTP_ADDR', line: 'export CONSUL_HTTP_ADDR="http://c1.${dns_domain}:8500"' }

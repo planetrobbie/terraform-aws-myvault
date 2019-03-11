@@ -1,0 +1,36 @@
+[v1]
+${v1} ansible_user=ubuntu
+
+[v2]
+${v2} ansible_user=ubuntu
+
+[c1]
+${c1} ansible_user=ubuntu
+
+[c2]
+${c2} ansible_user=ubuntu
+
+[c3]
+${c3} ansible_user=ubuntu
+
+[bastion]
+localhost
+
+[consul:children]
+c1
+c2
+c3
+
+[vault:children]
+v1
+v2
+
+[cluster:children]
+vault
+consul
+
+[front:children]
+bastion
+v1
+v2
+c1

@@ -1,0 +1,6 @@
+.DS_Store
+files/certbot/*
+files/priv_key
+files/snippet.tpl
+.terraform
+terraform.tfstate*

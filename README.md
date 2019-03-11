@@ -39,6 +39,20 @@ Now that our bucket has been created, you need to upload the required Certificat
 - install-vault.sh
 - vault-enterprise_1.0.2+ent_linux_amd64.zip (if you want to deploy an enterprise cluster)
 
+You'll find the install files in the following location there https://github.com/iainthegray/terraform-aws-vault/tree/master/packer/install_files
+
+For TLS certificates I'm using [Let's Encrypt](https://letsencrypt.org/).
+
+You can easily deploy an Open Source Vault cluster using the same code by replacing in `vault_cluster.tf` the following line
+
+    vault_bin      = "vault-enterprise_1.0.2+ent_linux_amd64.zip"
+
+by
+
+    vault_version  = "1.0.3"
+
+This will insure the Vault OSS binaries will be directly downloaded from HashiCorp release page.
+
 ## Deployment
 
 You're now ready to deploy your cluster

@@ -4,3 +4,4 @@ files/priv_key
 files/snippet.tpl
 .terraform
 terraform.tfstate*
+terraform.tfvars

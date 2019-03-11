@@ -50,7 +50,7 @@ output "consul_instance_ips" {
 }
 
 output "elb_dns" {
-  value = "${module.vault_cluster.elb_dns}"
+  value = "${aws_elb.vault_lb.dns_name}"
 }
 
 output "info" {
